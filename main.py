@@ -7,6 +7,19 @@ WIDTH = 120
 HEIGHT = 160
 LANES = [20, 60, 100]
 
+# PLAYERの設定
+PLAYER_WIDTH = 8
+PLAYER_HEIGHT = 12
+PLAYER_Y = HEIGHT - 30
+
+# 弾の設定
+BULLET_WIDTH = 2
+BULLET_HEIGHT = 4
+
+# 敵車の設定
+ENEMY_WIDTH = 8
+ENEMY_HEIGHT = 12
+
 
 class App:
     def __init__(self):
@@ -44,12 +57,12 @@ class App:
         if pyxel.btnp(pyxel.KEY_SPACE):
             player_x = LANES[self.player_lane]
             # 弾をプレイヤーの少し上に生成 [x座標, y座標]
-            self.bullets.append([player_x, HEIGHT - 20])
+            self.bullets.append([player_x, PLAYER_Y - BULLET_HEIGHT])
 
         # 弾の移動処理
         for b in self.bullets[:]:
             b[1] -= 5  # 上に向かって進む
-            if b[1] < 0:
+            if b[1] <= BULLET_HEIGHT * (-1):
                 self.bullets.remove(b)
 
         # 3. 敵車が向かってくる（スポーンと移動）
@@ -57,7 +70,7 @@ class App:
         if random.random() >= 0.20:
             if pyxel.frame_count % 10 == 0:
                 lane = random.randint(0, 2)
-                self.enemies.append([LANES[lane], -10])
+                self.enemies.append([LANES[lane], ENEMY_HEIGHT * (-1)])
 
         # 敵車の移動処理
         for e in self.enemies[:]:
@@ -70,7 +83,7 @@ class App:
         for b in self.bullets[:]:
             for e in self.enemies[:]:
                 # X座標が同じレーンで、Y座標が近ければ命中
-                if b[0] == e[0] and abs(b[1] - e[1]) < 10:
+                if b[0] == e[0] and abs(b[1] - e[1]) < ENEMY_HEIGHT - 2:
                     if b in self.bullets:
                         self.bullets.remove(b)
                     if e in self.enemies:
@@ -79,9 +92,8 @@ class App:
 
         # プレイヤーと敵車の当たり判定
         player_x = LANES[self.player_lane]
-        player_y = HEIGHT - 15
         for e in self.enemies:
-            if player_x == e[0] and abs(player_y - e[1]) < 15:
+            if player_x == e[0] and abs(PLAYER_Y - e[1]) < ENEMY_HEIGHT:
                 self.is_game_over = True
 
     def draw(self):
@@ -99,15 +111,17 @@ class App:
 
         # プレイヤーの描画（色5: 水色）
         player_x = LANES[self.player_lane]
-        pyxel.rect(player_x - 4, HEIGHT - 20, 8, 12, 5)
+        pyxel.rect(
+            player_x - PLAYER_WIDTH / 2, PLAYER_Y, PLAYER_WIDTH, PLAYER_HEIGHT, 5
+        )
 
         # 弾の描画（色10: 黄色）
         for b in self.bullets:
-            pyxel.rect(b[0] - 1, b[1] - 4, 2, 4, 10)
+            pyxel.rect(b[0] - BULLET_WIDTH / 2, b[1], BULLET_WIDTH, BULLET_HEIGHT, 10)
 
         # 敵車の描画（色8: 赤）
         for e in self.enemies:
-            pyxel.rect(e[0] - 4, e[1], 8, 12, 8)
+            pyxel.rect(e[0] - ENEMY_WIDTH / 2, e[1], ENEMY_WIDTH, ENEMY_HEIGHT, 8)
 
         # スコアの表示
         pyxel.text(5, 5, f"SCORE: {self.score}", 7)
