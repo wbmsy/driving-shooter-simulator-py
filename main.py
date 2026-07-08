@@ -53,10 +53,11 @@ class App:
                 self.bullets.remove(b)
 
         # 3. 敵車が向かってくる（スポーンと移動）
-        # 30フレームごとにランダムなレーンに敵を生成
-        if pyxel.frame_count % 30 == 0:
-            lane = random.randint(0, 2)
-            self.enemies.append([LANES[lane], -10])
+        # 10フレームごとに80％の確率でランダムなレーンに敵を生成
+        if random.random() >= 0.20:
+            if pyxel.frame_count % 10 == 0:
+                lane = random.randint(0, 2)
+                self.enemies.append([LANES[lane], -10])
 
         # 敵車の移動処理
         for e in self.enemies[:]:
