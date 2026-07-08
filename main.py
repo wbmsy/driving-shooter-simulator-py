@@ -92,9 +92,9 @@ class App:
             pyxel.text(30, HEIGHT // 2 + 10, "Press R to Restart", 7)
             return
 
-        # レーンの線を引く（背景）
-        for lx in LANES:
-            pyxel.line(lx, 0, lx, HEIGHT, 1)  # 色1(濃い青)
+        # レーンの境界線を引く（背景）
+        pyxel.line(40, 0, 40, HEIGHT, 1)
+        pyxel.line(80, 0, 80, HEIGHT, 1)
 
         # プレイヤーの描画（色5: 水色）
         player_x = LANES[self.player_lane]
