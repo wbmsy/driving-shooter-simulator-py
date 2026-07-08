@@ -2,7 +2,7 @@ import random
 
 import pyxel
 
-
+#konbanha
 class CatchGame:
     def __init__(self):
         # 画面サイズ: 160 x 160 px
