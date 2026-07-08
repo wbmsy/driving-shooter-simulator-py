@@ -2,97 +2,115 @@ import random
 
 import pyxel
 
-#konbanha
-class CatchGame:
+# 画面サイズとレーンのX座標（左・中央・右）
+WIDTH = 120
+HEIGHT = 160
+LANES = [20, 60, 100]
+
+
+class App:
     def __init__(self):
-        # 画面サイズ: 160 x 160 px
-        pyxel.init(160, 160, title="Apple Catch!")
-
-        # プレイヤーの初期設定 (x座標, y座標)
-        self.player_x = 72
-        self.player_y = 140
-        self.player_width = 16
-        self.player_height = 8
-
-        # リンゴの初期設定
-        self.apple_x = random.randint(0, 152)
-        self.apple_y = 0
-        self.apple_speed = 2
-
-        # ゲームの状態
-        self.score = 0
-        self.game_over = False
-
-        # ゲームスタート！
+        # 画面の初期化
+        pyxel.init(WIDTH, HEIGHT, title="Driving Shooter")
+        self.reset_game()
+        # ゲームループの開始
         pyxel.run(self.update, self.draw)
 
+    def reset_game(self):
+        # ゲームの初期状態
+        self.player_lane = 1  # 0:左, 1:中央, 2:右
+        self.bullets = []  # 弾のリスト
+        self.enemies = []  # 敵車のリスト
+        self.score = 0
+        self.is_game_over = False
+
     def update(self):
-        if self.game_over:
-            # ゲームオーバー時にスペースキーでリスタート
-            if pyxel.btnp(pyxel.KEY_SPACE):
-                self.__init__()
+        if pyxel.btnp(pyxel.KEY_Q):
+            pyxel.quit()
+
+        if self.is_game_over:
+            # ゲームオーバー時にRキーでリスタート
+            if pyxel.btnp(pyxel.KEY_R):
+                self.reset_game()
             return
 
-        # 1. プレイヤーの移動制限と操作
-        if pyxel.btn(pyxel.KEY_LEFT):
-            self.player_x = max(0, self.player_x - 3)
-        if pyxel.btn(pyxel.KEY_RIGHT):
-            self.player_x = min(160 - self.player_width, self.player_x + 3)
+        # 1. プレイヤーの移動（3レーン）
+        if pyxel.btnp(pyxel.KEY_LEFT) and self.player_lane > 0:
+            self.player_lane -= 1
+        if pyxel.btnp(pyxel.KEY_RIGHT) and self.player_lane < 2:
+            self.player_lane += 1
 
-        # 2. リンゴの落下
-        self.apple_y += self.apple_speed
+        # 2. 銃を撃つ
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            player_x = LANES[self.player_lane]
+            # 弾をプレイヤーの少し上に生成 [x座標, y座標]
+            self.bullets.append([player_x, HEIGHT - 20])
 
-        # 3. 当たり判定（プレイヤーとリンゴが重なったか？）
-        # 簡単な矩形（ボックス）同士の当たり判定です
-        if (
-            self.player_x < self.apple_x + 8
-            and self.player_x + self.player_width > self.apple_x
-            and self.player_y < self.apple_y + 8
-            and self.player_y + self.player_height > self.apple_y
-        ):
-            # キャッチ成功！
-            self.score += 10
-            # リンゴを上部に戻してスピードアップ
-            self.apple_x = random.randint(0, 152)
-            self.apple_y = 0
-            self.apple_speed = min(8, self.apple_speed + 0.2)  # 徐々に速くなる
-            # ピピッという高音（組み込みの効果音）を鳴らす
-            pyxel.play(0, 0)
+        # 弾の移動処理
+        for b in self.bullets[:]:
+            b[1] -= 5  # 上に向かって進む
+            if b[1] < 0:
+                self.bullets.remove(b)
 
-        # 4. 見逃し判定（地面に落ちたか？）
-        if self.apple_y > 160:
-            self.game_over = True
+        # 3. 敵車が向かってくる（スポーンと移動）
+        # 30フレームごとにランダムなレーンに敵を生成
+        if pyxel.frame_count % 30 == 0:
+            lane = random.randint(0, 2)
+            self.enemies.append([LANES[lane], -10])
+
+        # 敵車の移動処理
+        for e in self.enemies[:]:
+            e[1] += 2  # 下に向かって進む
+            if e[1] > HEIGHT:
+                self.enemies.remove(e)
+
+        # 4. 当たり判定（衝突処理）
+        # 弾と敵車の当たり判定
+        for b in self.bullets[:]:
+            for e in self.enemies[:]:
+                # X座標が同じレーンで、Y座標が近ければ命中
+                if b[0] == e[0] and abs(b[1] - e[1]) < 10:
+                    if b in self.bullets:
+                        self.bullets.remove(b)
+                    if e in self.enemies:
+                        self.enemies.remove(e)
+                    self.score += 100
+
+        # プレイヤーと敵車の当たり判定
+        player_x = LANES[self.player_lane]
+        player_y = HEIGHT - 15
+        for e in self.enemies:
+            if player_x == e[0] and abs(player_y - e[1]) < 15:
+                self.is_game_over = True
 
     def draw(self):
         # 画面を黒(0)でクリア
         pyxel.cls(0)
 
-        if self.game_over:
-            # ゲームオーバー画面
-            pyxel.text(50, 60, "GAME OVER", 8)  # 赤色でテキスト
-            pyxel.text(45, 80, f"SCORE: {self.score}", 7)
-            pyxel.text(30, 100, "PRESS SPACE TO RESET", 10)
-        else:
-            # プレイ中画面
+        if self.is_game_over:
+            pyxel.text(35, HEIGHT // 2 - 10, "GAME OVER", pyxel.frame_count % 16)
+            pyxel.text(30, HEIGHT // 2 + 10, "Press R to Restart", 7)
+            return
 
-            # 地面を描画 (暗い緑の帯)
-            pyxel.rect(0, 148, 160, 12, 3)
+        # レーンの線を引く（背景）
+        for lx in LANES:
+            pyxel.line(lx, 0, lx, HEIGHT, 1)  # 色1(濃い青)
 
-            # プレイヤーを描画 (緑色の四角)
-            pyxel.rect(
-                self.player_x, self.player_y, self.player_width, self.player_height, 11
-            )
+        # プレイヤーの描画（色5: 水色）
+        player_x = LANES[self.player_lane]
+        pyxel.rect(player_x - 4, HEIGHT - 20, 8, 12, 5)
 
-            # リンゴを描画 (赤い円)
-            pyxel.circ(
-                self.apple_x + 4, self.apple_y + 4, 4, 8
-            )  # (中心x, 中心y, 半径, 色8=赤)
-            # リンゴのヘタ (緑のドット)
-            pyxel.pset(self.apple_x + 4, self.apple_y, 3)
+        # 弾の描画（色10: 黄色）
+        for b in self.bullets:
+            pyxel.rect(b[0] - 1, b[1] - 4, 2, 4, 10)
 
-            # スコアを描画
-            pyxel.text(5, 5, f"SCORE: {self.score}", 7)  # 白色でスコア表示
+        # 敵車の描画（色8: 赤）
+        for e in self.enemies:
+            pyxel.rect(e[0] - 4, e[1], 8, 12, 8)
+
+        # スコアの表示
+        pyxel.text(5, 5, f"SCORE: {self.score}", 7)
 
 
-# ゲームの起動
-CatchGame()
+# ゲームの実行
+App()
