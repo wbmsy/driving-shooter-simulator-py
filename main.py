@@ -15,6 +15,7 @@ PLAYER_Y = HEIGHT - 30
 # 弾の設定
 BULLET_WIDTH = 2
 BULLET_HEIGHT = 4
+MAX_BULLET_COUNT = 3
 
 # 敵車の設定
 ENEMY_WIDTH = 8
@@ -34,6 +35,7 @@ class App:
         self.player_lane = 1  # 0:左, 1:中央, 2:右
         self.bullets = []  # 弾のリスト
         self.enemies = []  # 敵車のリスト
+        self.bullet_count = 0
         self.score = 0
         self.is_game_over = False
 
@@ -54,16 +56,23 @@ class App:
             self.player_lane += 1
 
         # 2. 銃を撃つ
-        if pyxel.btnp(pyxel.KEY_SPACE):
-            player_x = LANES[self.player_lane]
-            # 弾をプレイヤーの少し上に生成 [x座標, y座標]
-            self.bullets.append([player_x, PLAYER_Y - BULLET_HEIGHT])
+        if self.bullet_count > 0:
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.bullet_count -= 1
+                player_x = LANES[self.player_lane]
+                # 弾をプレイヤーの少し上に生成 [x座標, y座標]
+                self.bullets.append([player_x, PLAYER_Y - BULLET_HEIGHT])
 
         # 弾の移動処理
         for b in self.bullets[:]:
             b[1] -= 5  # 上に向かって進む
             if b[1] <= BULLET_HEIGHT * (-1):
                 self.bullets.remove(b)
+
+        # 弾の補充
+        if pyxel.frame_count % 40 == 0:
+            if self.bullet_count < MAX_BULLET_COUNT:
+                self.bullet_count += 1
 
         # 3. 敵車が向かってくる（スポーンと移動）
         # 10フレームごとに80％の確率でランダムなレーンに敵を生成
