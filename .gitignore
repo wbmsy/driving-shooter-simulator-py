@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Pyxel example files
+pyxel_examples
+
+# Virtual environments
+.venv
+
+# devfiles
+uv.lock
+pyproject.toml
+mise.toml
+.python-version
