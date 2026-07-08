@@ -37,6 +37,7 @@ class App:
         self.enemies = []  # 敵車のリスト
         self.bullet_count = 0
         self.score = 0
+        self.enemy_speed_multiplier = 1.0
         self.is_game_over = False
 
     def update(self):
@@ -83,9 +84,13 @@ class App:
 
         # 敵車の移動処理
         for e in self.enemies[:]:
-            e[1] += 2  # 下に向かって進む
+            e[1] += 2 * self.enemy_speed_multiplier  # 下に向かって進む
             if e[1] > HEIGHT:
                 self.enemies.remove(e)
+
+        # 敵車の速度を上げる
+        if pyxel.frame_count % 60 == 0:
+            self.enemy_speed_multiplier += 0.1
 
         # 4. 当たり判定（衝突処理）
         # 弾と敵車の当たり判定
