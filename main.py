@@ -90,7 +90,7 @@ class App:
                 self.enemies.remove(e)
 
         # 敵車の速度を上げる
-        if self.game_time % 10 == 0:
+        if self.game_time % 10 == 0 and self.game_time != 0 and pyxel.frame_count % 30 == 0:
             self.enemy_speed_multiplier += 0.5
 
         # 4. 当たり判定（衝突処理）
@@ -147,6 +147,7 @@ class App:
         pyxel.text(5, 5, f"SCORE: {self.score}", 7)
         pyxel.text(75, 5, f"BULLETS: {self.bullet_count}", 7)
         pyxel.text(75, 15, f"TIME: {self.game_time}", 7)
+        pyxel.text(75, 25, f"SPEED: {self.enemy_speed_multiplier:.1f}", 7)
 
 
 # ゲームの実行
