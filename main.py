@@ -13,7 +13,6 @@ PLAYER_HEIGHT = 12
 PLAYER_Y = HEIGHT - 30
 
 # 弾の設定
-BULLET_WIDTH = 2
 BULLET_HEIGHT = 4
 MAX_BULLET_COUNT = 3
 
@@ -26,6 +25,7 @@ class App:
     def __init__(self):
         # 画面の初期化
         pyxel.init(WIDTH, HEIGHT, title="Driving Shooter")
+        pyxel.load("resource.pyxres")
         self.reset_game()
         # ゲームループの開始
         pyxel.run(self.update, self.draw)
@@ -131,7 +131,8 @@ class App:
 
         # 弾の描画（色10: 黄色）
         for b in self.bullets:
-            pyxel.rect(b[0] - BULLET_WIDTH / 2, b[1], BULLET_WIDTH, BULLET_HEIGHT, 10)
+            # pyxel.rect(b[0] - BULLET_WIDTH / 2, b[1], BULLET_WIDTH, BULLET_HEIGHT, 10)
+            pyxel.blt(b[0] - 3.75, b[1], 0, 0, 0, 8, 8, colkey=0, scale=0.8)
 
         # 敵車の描画（色8: 赤）
         for e in self.enemies:
