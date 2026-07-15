@@ -140,6 +140,7 @@ class App:
 
         # スコアの表示
         pyxel.text(5, 5, f"SCORE: {self.score}", 7)
+        pyxel.text(75, 5, f"BULLETS: {self.bullet_count}", 7)
 
 
 # ゲームの実行
