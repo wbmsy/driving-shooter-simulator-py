@@ -130,9 +130,10 @@ class App:
 
         # プレイヤーの描画（色5: 水色）
         player_x = LANES[self.player_lane]
-        pyxel.rect(
-            player_x - PLAYER_WIDTH / 2, PLAYER_Y, PLAYER_WIDTH, PLAYER_HEIGHT, 5
-        )
+        # pyxel.rect(
+        #     player_x - PLAYER_WIDTH / 2, PLAYER_Y, PLAYER_WIDTH, PLAYER_HEIGHT, 5
+        # )
+        pyxel.blt(player_x - 7, PLAYER_Y, 0, 1, 17, 14, 13, colkey=0, scale=1)
 
         # 弾の描画（色10: 黄色）
         for b in self.bullets:
