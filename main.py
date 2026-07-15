@@ -39,6 +39,7 @@ class App:
         self.score = 0
         self.enemy_speed_multiplier = 1.0
         self.is_game_over = False
+        self.game_time = 0
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
@@ -89,8 +90,8 @@ class App:
                 self.enemies.remove(e)
 
         # 敵車の速度を上げる
-        if pyxel.frame_count % 60 == 0:
-            self.enemy_speed_multiplier += 0.1
+        if self.game_time % 10 == 0:
+            self.enemy_speed_multiplier += 0.5
 
         # 4. 当たり判定（衝突処理）
         # 弾と敵車の当たり判定
@@ -109,6 +110,10 @@ class App:
         for e in self.enemies:
             if player_x == e[0] and abs(PLAYER_Y - e[1]) < ENEMY_HEIGHT:
                 self.is_game_over = True
+
+        # 経過時間の更新
+        if pyxel.frame_count % 30 == 0:
+            self.game_time += 1
 
     def draw(self):
         # 画面を黒(0)でクリア
@@ -141,6 +146,7 @@ class App:
         # スコアの表示
         pyxel.text(5, 5, f"SCORE: {self.score}", 7)
         pyxel.text(75, 5, f"BULLETS: {self.bullet_count}", 7)
+        pyxel.text(75, 15, f"TIME: {self.game_time}", 7)
 
 
 # ゲームの実行
