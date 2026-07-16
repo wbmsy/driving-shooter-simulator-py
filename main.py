@@ -81,7 +81,8 @@ class App:
         if random.random() >= 0.20:
             if pyxel.frame_count % 10 == 0:
                 lane = random.randint(0, 2)
-                self.enemies.append([LANES[lane], ENEMY_HEIGHT * (-1)])
+                type = random.randint(0, 3)
+                self.enemies.append([LANES[lane], ENEMY_HEIGHT * (-1), type])
 
         # 敵車の移動処理
         for e in self.enemies[:]:
@@ -142,7 +143,16 @@ class App:
 
         # 敵車の描画（色8: 赤）
         for e in self.enemies:
-            pyxel.rect(e[0] - ENEMY_WIDTH / 2, e[1], ENEMY_WIDTH, ENEMY_HEIGHT, 8)
+            # pyxel.rect(e[0] - ENEMY_WIDTH / 2, e[1], ENEMY_WIDTH, ENEMY_HEIGHT, 8)
+            match e[2]:
+                case 0:
+                    pyxel.blt(e[0] - 7.8, e[1], 0, 0, 32, 16, 16, colkey=13, scale=1.3)
+                case 1:
+                    pyxel.blt(e[0] - 7.8, e[1], 0, 16, 32, 16, 16, colkey=13, scale=1.2)
+                case 2:
+                    pyxel.blt(e[0] - 7.8, e[1], 0, 32, 32, 16, 16, colkey=13, scale=1.0)
+                case 3:
+                    pyxel.blt(e[0] - 7.8, e[1], 0, 48, 32, 16, 16, colkey=13, scale=0.9)
 
         # スコアの表示
         pyxel.text(5, 5, f"SCORE: {self.score}", 7)
