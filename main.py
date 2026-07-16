@@ -35,8 +35,9 @@ class App:
         self.player_lane = 1  # 0:左, 1:中央, 2:右
         self.bullets = []  # 弾のリスト
         self.enemies = []  # 敵車のリスト
+        self.explosion = []  # 爆発のリスト
         self.bullet_count = 0
-        self.score = 0
+        self.kills = 0
         self.enemy_speed_multiplier = 1.0
         self.is_game_over = False
         self.game_time = 0
@@ -100,11 +101,20 @@ class App:
             for e in self.enemies[:]:
                 # X座標が同じレーンで、Y座標が近ければ命中
                 if b[0] == e[0] and abs(b[1] - e[1]) < ENEMY_HEIGHT - 2:
-                    if b in self.bullets:
-                        self.bullets.remove(b)
-                    if e in self.enemies:
-                        self.enemies.remove(e)
-                    self.score += 100
+                    self.explosion.append([e[0], e[1], 0])  # 爆発の座標を追加
+                    # if b in self.bullets:
+                    self.bullets.remove(b)
+                    # if e in self.enemies:
+                    self.enemies.remove(e)
+                    self.kills += 1
+
+        # 爆発の処理
+        for exp in self.explosion[:]:
+            exp[1] += 2 * self.enemy_speed_multiplier  # 爆発のY座標を下に移動
+            exp[2] += 1
+            if exp[2] > 5:  # 爆発のアニメーションが5フレームで終了
+                self.explosion.remove(exp)  # 爆発を削除
+
 
         # プレイヤーと敵車の当たり判定
         player_x = LANES[self.player_lane]
@@ -121,8 +131,8 @@ class App:
         pyxel.cls(0)
 
         if self.is_game_over:
-            pyxel.text(35, HEIGHT // 2 - 10, "GAME OVER", pyxel.frame_count % 16)
-            pyxel.text(30, HEIGHT // 2 + 10, "Press R to Restart", 7)
+            pyxel.text(WIDTH // 2 - len("GAME OVER") * 4 // 2, HEIGHT // 2 - 10, "GAME OVER", pyxel.frame_count % 16)
+            pyxel.text(WIDTH // 2 - len("Press R to Restart") * 4 // 2, HEIGHT // 2 + 10, "Press R to Restart", 7)
             return
 
         # レーンの境界線を引く（背景）
@@ -153,9 +163,13 @@ class App:
                     pyxel.blt(e[0] - 7.8, e[1], 0, 32, 32, 16, 16, colkey=13, scale=1.0)
                 case 3:
                     pyxel.blt(e[0] - 7.8, e[1], 0, 48, 32, 16, 16, colkey=13, scale=0.9)
+        
+        # 爆発の描画（色9: オレンジ）
+        for exp in self.explosion:
+            pyxel.blt(exp[0] - 8, exp[1], 0, 16, 0, 16, 16, colkey=0, scale=1)
 
         # スコアの表示
-        pyxel.text(5, 5, f"SCORE: {self.score}", 7)
+        pyxel.text(5, 5, f"KILLS: {self.kills}", 7)
         pyxel.text(75, 5, f"BULLETS: {self.bullet_count}", 7)
         pyxel.text(75, 15, f"TIME: {self.game_time}", 7)
         pyxel.text(75, 25, f"SPEED: {self.enemy_speed_multiplier:.1f}", 7)
