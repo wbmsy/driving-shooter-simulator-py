@@ -133,10 +133,15 @@ class App:
         for e in self.enemies:
             if player_x == e[0] and abs(PLAYER_Y - e[1]) < ENEMY_HEIGHT:
                 self.game_status = 3
+                pyxel.play(0,0)
 
         # 経過時間の更新
         if pyxel.frame_count % 30 == 0:
             self.game_time += 1
+
+        # ゴール条件
+        if self.game_time == 60:
+            self.game_status = 2
 
     def draw(self):
         # 画面を黒(0)でクリア
