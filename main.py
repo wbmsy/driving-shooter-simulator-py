@@ -144,7 +144,7 @@ class App:
             self.game_time += 1
 
         # ゴール条件
-        if self.game_time == 10:
+        if self.game_time == 60:
             pyxel.play(0,1)
             self.game_status = 2
 
