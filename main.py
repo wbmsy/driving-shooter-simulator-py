@@ -52,6 +52,8 @@ class App:
             return
 
         if self.game_status == 2:
+            if pyxel.btnp(pyxel.KEY_R):
+                self.reset_game(1)
             if pyxel.btnp(pyxel.KEY_SPACE):
                 self.reset_game(0)
             return
@@ -152,7 +154,9 @@ class App:
             return
 
         if self.game_status == 2:
-            pyxel.text(WIDTH // 2 - len("Press Space to Start") * 4 // 2, HEIGHT // 2, "Press Space to Start", 7)
+            pyxel.text(WIDTH // 2 - len("CLEAR!!") * 4 // 2, HEIGHT // 2, "CLEAR!!", pyxel.frame_count % 16)
+            pyxel.text(WIDTH // 2 - len("Restart: R") * 4 // 2, HEIGHT // 2 + 15, "Restart: R", 7)
+            pyxel.text(WIDTH // 2 - len("Home: Space") * 4 // 2, HEIGHT // 2 + 25, "Home: Space", 7)
             return
 
         if self.game_status == 3:
