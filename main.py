@@ -113,7 +113,8 @@ class App:
             for e in self.enemies[:]:
                 # X座標が同じレーンで、Y座標が近ければ命中
                 if b[0] == e[0] and abs(b[1] - e[1]) < ENEMY_HEIGHT - 2:
-                    self.explosion.append([e[0], e[1], 0])  # 爆発の座標を追加
+                    self.explosion.append([e[0], e[1], 0]) # 爆発の座標を追加
+                    pyxel.play(0,2)  
                     # if b in self.bullets:
                     self.bullets.remove(b)
                     # if e in self.enemies:
@@ -133,7 +134,8 @@ class App:
         for e in self.enemies:
             if player_x == e[0] and abs(PLAYER_Y - e[1]) < ENEMY_HEIGHT:
                 self.game_status = 3
-                pyxel.play(0,0)
+                pyxel.play(0,2)
+                pyxel.play(1,0)
 
         # 経過時間の更新
         if pyxel.frame_count % 30 == 0:
