@@ -72,7 +72,7 @@ class App:
 
         # 2. 銃を撃つ
         if self.bullet_count > 0:
-            if pyxel.btnp(pyxel.KEY_SPACE):
+            if pyxel.btnp(pyxel.KEY_Z):
                 self.bullet_count -= 1
                 player_x = LANES[self.player_lane]
                 # 弾をプレイヤーの少し上に生成 [x座標, y座標]
