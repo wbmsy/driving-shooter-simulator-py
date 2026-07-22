@@ -141,6 +141,7 @@ class App:
 
         # ゴール条件
         if self.game_time == 60:
+            pyxel.play(0,1)
             self.game_status = 2
 
     def draw(self):
