@@ -116,7 +116,7 @@ class App:
                 # X座標が同じレーンで、Y座標が近ければ命中
                 if b[0] == e[0] and abs(b[1] - e[1]) < ENEMY_HEIGHT - 2:
                     self.explosion.append([e[0], e[1], 0]) # 爆発の座標を追加
-                    pyxel.play(0,2)  
+                    pyxel.play(0,2)
                     # if b in self.bullets:
                     self.bullets.remove(b)
                     # if e in self.enemies:
@@ -144,7 +144,7 @@ class App:
             self.game_time += 1
 
         # ゴール条件
-        if self.game_time == 60:
+        if self.game_time == 10:
             pyxel.play(0,1)
             self.game_status = 2
 
@@ -153,10 +153,12 @@ class App:
         pyxel.cls(0)
 
         if self.game_status == 0:
+            pyxel.cls(1)
             pyxel.text(WIDTH // 2 - len("Press Space to Start") * 4 // 2, HEIGHT // 2, "Press Space to Start", 7)
             return
 
         if self.game_status == 2:
+            pyxel.cls(6)
             pyxel.text(WIDTH // 2 - len("CLEAR!!") * 4 // 2, HEIGHT // 2, "CLEAR!!", pyxel.frame_count % 16)
             pyxel.text(WIDTH // 2 - len("Restart: R") * 4 // 2, HEIGHT // 2 + 15, "Restart: R", 7)
             pyxel.text(WIDTH // 2 - len("Home: Space") * 4 // 2, HEIGHT // 2 + 25, "Home: Space", 7)
