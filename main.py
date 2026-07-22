@@ -26,11 +26,11 @@ class App:
         # 画面の初期化
         pyxel.init(WIDTH, HEIGHT, title="Driving Shooter")
         pyxel.load("resource.pyxres")
-        self.reset_game()
+        self.reset_game(0)
         # ゲームループの開始
         pyxel.run(self.update, self.draw)
 
-    def reset_game(self):
+    def reset_game(self, status):
         # ゲームの初期状態
         self.player_lane = 1  # 0:左, 1:中央, 2:右
         self.bullets = []  # 弾のリスト
@@ -39,17 +39,29 @@ class App:
         self.bullet_count = 0
         self.kills = 0
         self.enemy_speed_multiplier = 1.0
-        self.is_game_over = False
         self.game_time = 0
+        self.game_status = status # 0:ホーム, 1:プレイ, 2:クリア, 3:ゲームオーバー
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
 
-        if self.is_game_over:
+        if self.game_status == 0:
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.reset_game(1)
+            return
+
+        if self.game_status == 2:
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.reset_game(0)
+            return
+
+        if self.game_status == 3:
             # ゲームオーバー時にRキーでリスタート
             if pyxel.btnp(pyxel.KEY_R):
-                self.reset_game()
+                self.reset_game(1)
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.reset_game(0)
             return
 
         # 1. プレイヤーの移動（3レーン）
@@ -120,7 +132,7 @@ class App:
         player_x = LANES[self.player_lane]
         for e in self.enemies:
             if player_x == e[0] and abs(PLAYER_Y - e[1]) < ENEMY_HEIGHT:
-                self.is_game_over = True
+                self.game_status = 3
 
         # 経過時間の更新
         if pyxel.frame_count % 30 == 0:
@@ -130,9 +142,18 @@ class App:
         # 画面を黒(0)でクリア
         pyxel.cls(0)
 
-        if self.is_game_over:
-            pyxel.text(WIDTH // 2 - len("GAME OVER") * 4 // 2, HEIGHT // 2 - 10, "GAME OVER", pyxel.frame_count % 16)
-            pyxel.text(WIDTH // 2 - len("Press R to Restart") * 4 // 2, HEIGHT // 2 + 10, "Press R to Restart", 7)
+        if self.game_status == 0:
+            pyxel.text(WIDTH // 2 - len("Press Space to Start") * 4 // 2, HEIGHT // 2, "Press Space to Start", 7)
+            return
+
+        if self.game_status == 2:
+            pyxel.text(WIDTH // 2 - len("Press Space to Start") * 4 // 2, HEIGHT // 2, "Press Space to Start", 7)
+            return
+
+        if self.game_status == 3:
+            pyxel.text(WIDTH // 2 - len("GAME OVER") * 4 // 2, HEIGHT // 2, "GAME OVER", pyxel.frame_count % 16)
+            pyxel.text(WIDTH // 2 - len("Restart: R") * 4 // 2, HEIGHT // 2 + 15, "Restart: R", 7)
+            pyxel.text(WIDTH // 2 - len("Home: Space") * 4 // 2, HEIGHT // 2 + 25, "Home: Space", 7)
             return
 
         # レーンの境界線を引く（背景）
@@ -163,7 +184,7 @@ class App:
                     pyxel.blt(e[0] - 7.8, e[1], 0, 32, 32, 16, 16, colkey=13, scale=1.0)
                 case 3:
                     pyxel.blt(e[0] - 7.8, e[1], 0, 48, 32, 16, 16, colkey=13, scale=0.9)
-        
+
         # 爆発の描画（色9: オレンジ）
         for exp in self.explosion:
             pyxel.blt(exp[0] - 8, exp[1], 0, 16, 0, 16, 16, colkey=0, scale=1)
